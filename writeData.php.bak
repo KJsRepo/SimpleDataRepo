@@ -1,0 +1,58 @@
+<?php
+
+include("include/headerscript.php");
+
+if(!empty($_POST)) {
+	$inputVars = $_POST;
+} else {
+	$inputVars = $_GET;
+}
+
+if(@$inputVars['process_name'] == NULL) {
+	$inputVars['process_name'] = '';
+}
+
+if(@$inputVars['allow_duplicates'] != 1
+	&& @$inputVars['allow_cleared_duplicates'] != 1) {
+
+	if(@$inputVars['allow_duplicates'] != 1) {
+
+		$sql = 'SELECT * FROM Events WHERE Repo = ?
+					AND Node = ?
+					AND Data = ?
+					AND (Cleared_By IS NULL
+					OR Cleared_By = "")';
+
+	} elseif(@$inputVars['allow_cleared_duplicates'] != 1) {
+
+				$sql = 'SELECT * FROM Events WHERE Repo = ?
+							AND Node = ?
+							AND Data = ?';
+	}
+
+	$stmt = $conn->prepare($sql);
+
+	$stmt->bind_param("sss", $inputVars['repo'], $inputVars['node'], $inputVars['data']);
+
+	$stmt->execute();
+	$rows = $stmt->get_result();
+
+	$is_duplicate = ($rows->num_rows > 0 ? true : false);
+}
+
+if(!$is_duplicate || @$inputVars['allow_duplicates']) {
+	
+	$stmt = $conn->prepare('INSERT INTO Events (Repo, User, Node, Data, DataSetIndex, Process_Name) VALUES (?,?,?,?,?,?)');
+	$stmt->bind_param("ssssis", $inputVars['repo'], $inputVars['user'], $inputVars['node'], $inputVars['data'], $inputVars['dataset'], $inputVars['process_name']);
+	$success = $stmt->execute();
+
+	if($success) {
+		echo('success');
+	} else {
+		echo('failure');
+	}
+} else {
+	echo('failure: is duplicate');
+}
+
+?>
