@@ -77,7 +77,7 @@ if(!$is_duplicate || @$inputVars['allow_duplicates']) {
 	if($success) {
 		echo('success');
 	} else {
-		echo('failure');
+		echo('failure: ' . $stmt->error);
 	}
 } else {
 	echo('failure: is duplicate');
