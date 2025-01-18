@@ -83,7 +83,7 @@ $qry .= ' LIMIT 1 ';
 $result = $conn->query($qry);
 $row = mysqli_fetch_assoc($result);
 
-if(stripos($row['Cleared_By'], @$inputVars['ignore_cleared_by']) !== false) {
+if(@$inputVars['ignore_cleared_by'] != '' && stripos(@$row['Cleared_By'], @$inputVars['ignore_cleared_by']) !== false) {
 	$row = false;
 }
 

@@ -15,7 +15,7 @@ $success = $stmt->execute();
 if($success) {
 	echo('success');
 } else {
-	echo('failure');
+	echo('failure: ' . $stmt->error);
 }
 
 ?>
